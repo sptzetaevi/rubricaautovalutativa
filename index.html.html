@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#254f86" />
+  <title>Rubrica indicatori TIC</title>
+  <style>
+    :root {
+      --bg: #f4f6f9;
+      --card: #ffffff;
+      --text: #182433;
+      --muted: #66758a;
+      --border: #d9e0ea;
+      --accent: #254f86;
+      --accent-2: #e8f1ff;
+      --accent-3: #cfe1fb;
+      --ok: #157347;
+      --warn: #a05a00;
+      --danger: #b42318;
+      --shadow: 0 4px 18px rgba(20, 35, 55, .08);
+      --radius: 18px;
+      --footer-height: 88px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      padding-bottom: calc(var(--footer-height) + env(safe-area-inset-bottom));
+    }
+
+    header {
+      background: linear-gradient(135deg, #254f86, #3972b8);
+      color: #fff;
+      padding: 22px 16px 18px;
+    }
+
+    .header-inner {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.35rem, 4vw, 2rem);
+      line-height: 1.15;
+    }
+
+    header p {
+      margin: 0;
+      opacity: .92;
+      font-size: .98rem;
+    }
+
+    main {
+      max-width: 980px;
+      margin: 16px auto;
+      padding: 0 12px;
+    }
+
+    .intro-card, details {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 14px;
+      overflow: hidden;
+    }
+
+    .intro-card {
+      padding: 14px;
+    }
+
+    .intro-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: .95rem;
+    }
+
+    summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 16px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 58px;
+      font-weight: 700;
+      color: var(--accent);
+      background: var(--card);
+      user-select: none;
+    }
+
+    summary::-webkit-details-marker { display: none; }
+
+    .summary-left {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .summary-title {
+      font-size: 1.05rem;
+    }
+
+    .summary-progress {
+      font-size: .85rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .chevron {
+      flex: 0 0 auto;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--accent-2);
+      display: grid;
+      place-items: center;
+      transition: transform .2s ease;
+    }
+
+    details[open] .chevron { transform: rotate(90deg); }
+
+    .area-content {
+      padding: 0 10px 12px;
+    }
+
+    .indicator {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      margin: 10px 0;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .indicator-title {
+      padding: 13px 12px;
+      font-weight: 700;
+      background: #f6f8fb;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .levels {
+      display: grid;
+      gap: 0;
+    }
+
+    .level {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 8px;
+      padding: 14px 12px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      min-height: 64px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .level:last-child { border-bottom: 0; }
+
+    .level:active { background: var(--accent-2); }
+
+    .level input {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 24px;
+      height: 24px;
+      margin: 2px 0 0;
+      border: 2px solid #9aabc1;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+    }
+
+    .level input::before {
+      content: "";
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      transform: scale(0);
+      transition: transform .12s ease;
+      background: var(--accent);
+    }
+
+    .level input:checked {
+      border-color: var(--accent);
+      background: #fff;
+    }
+
+    .level input:checked::before {
+      transform: scale(1);
+    }
+
+    .level-text-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .level-name {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--accent);
+      background: var(--accent-2);
+    }
+
+    .level-text {
+      font-size: .95rem;
+      color: var(--text);
+    }
+
+    .level.selected {
+      background: var(--accent-2);
+      outline: 2px solid var(--accent-3);
+      outline-offset: -2px;
+    }
+
+    .footerbar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      min-height: var(--footer-height);
+      padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+      background: rgba(255, 255, 255, .96);
+      border-top: 1px solid var(--border);
+      box-shadow: 0 -5px 20px rgba(20, 35, 55, .14);
+      z-index: 20;
+      backdrop-filter: blur(8px);
+    }
+
+    .footer-inner {
+      max-width: 980px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .progress-text {
+      font-weight: 700;
+      color: var(--accent);
+      font-size: .95rem;
+    }
+
+    .progressbar {
+      height: 8px;
+      border-radius: 999px;
+      background: #e7ebf1;
+      margin-top: 7px;
+      overflow: hidden;
+    }
+
+    .progressbar span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      transition: width .18s ease;
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 13px 18px;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--accent);
+      color: white;
+      font-size: 1rem;
+      min-height: 48px;
+    }
+
+    button.secondary {
+      background: #edf1f6;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    button.danger {
+      background: #fff2f1;
+      color: var(--danger);
+      border: 1px solid #ffd0cc;
+    }
+
+    dialog {
+      border: 0;
+      border-radius: 20px;
+      width: min(780px, calc(100vw - 20px));
+      max-height: min(88vh, 780px);
+      box-shadow: 0 18px 60px rgba(0,0,0,.32);
+      padding: 0;
+      overflow: hidden;
+    }
+
+    dialog::backdrop {
+      background: rgba(0,0,0,.45);
+    }
+
+    .modal {
+      padding: 16px;
+      overflow: auto;
+      max-height: min(88vh, 780px);
+    }
+
+    .modal h2 {
+      margin: 0 0 10px;
+      color: var(--accent);
+      font-size: 1.25rem;
+    }
+
+    .field { margin: 12px 0; }
+
+    .fieldlabel {
+      display: block;
+      font-weight: 700;
+      font-size: .92rem;
+      margin-bottom: 6px;
+    }
+
+    input[type="email"], input[type="text"], textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 1rem;
+      background: #fff;
+      color: var(--text);
+    }
+
+    textarea {
+      min-height: 240px;
+      resize: vertical;
+      white-space: pre-wrap;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .actions.three {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .small {
+      font-size: .86rem;
+      color: var(--muted);
+      margin: 8px 0 0;
+    }
+
+    .status {
+      margin: 10px 0 0;
+      font-weight: 700;
+    }
+
+    .status.error { color: var(--danger); }
+    .status.success { color: var(--ok); }
+    .status.warn { color: var(--warn); }
+
+    .hidden { display: none; }
+
+    @media (min-width: 800px) {
+      .area-content {
+        padding: 0 14px 16px;
+      }
+
+      .level {
+        grid-template-columns: 34px 94px 1fr;
+        align-items: start;
+      }
+
+      .level-text-wrap {
+        display: contents;
+      }
+
+      .level-name {
+        margin-top: 1px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      header {
+        padding: 18px 12px 14px;
+      }
+
+      main {
+        padding: 0 8px;
+        margin-top: 10px;
+      }
+
+      .intro-card {
+        padding: 12px;
+      }
+
+      summary {
+        padding: 15px 12px;
+      }
+
+      .indicator-title {
+        padding: 12px 10px;
+      }
+
+      .level {
+        padding: 14px 10px;
+        grid-template-columns: 32px 1fr;
+      }
+
+      .footer-inner {
+        grid-template-columns: 1fr;
+        gap: 9px;
+      }
+
+      .footerbar button {
+        width: 100%;
+      }
+
+      .actions, .actions.three {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="header-inner">
+    <h1>Rubrica indicatori TIC</h1>
+    <p>Seleziona il livello più adatto per ogni indicatore. I dati restano salvati sul dispositivo fino all’invio o all’azzeramento.</p>
+  </div>
+</header>
+
+<main>
+  <div class="intro-card">
+    <p>
+      Apri le sezioni, scegli un livello per gli indicatori compilati e premi <strong>Concludi</strong>.
+      Alla fine potrai inviare una copia via email tramite Google Apps Script.
+    </p>
+  </div>
+
+  <section id="rubriche" aria-label="Rubrica di valutazione"></section>
+</main>
+
+<div class="footerbar">
+  <div class="footer-inner">
+    <div>
+      <div class="progress-text" id="progressText">0/0 indicatori selezionati</div>
+      <div class="progressbar" aria-hidden="true"><span id="progressBar"></span></div>
+    </div>
+    <button type="button" onclick="openConclusion()">Concludi</button>
+  </div>
+</div>
+
+<dialog id="conclusionDialog">
+  <div class="modal">
+    <h2>Conclusione e invio</h2>
+
+    <div class="field">
+      <label class="fieldlabel" for="nome">Nome e cognome</label>
+      <input type="text" id="nome" placeholder="Es. Ilaria Rossi" autocomplete="name" />
+    </div>
+
+    <div class="field">
+      <label class="fieldlabel" for="email">Email a cui inviare la copia</label>
+      <input type="email" id="email" placeholder="nome@esempio.it" autocomplete="email" />
+    </div>
+
+    <div class="field">
+      <label class="fieldlabel" for="output">Riepilogo</label>
+      <textarea id="output" readonly></textarea>
+    </div>
+
+    <p class="small">
+      L’invio utilizza una Web App di Google Apps Script. La copia viene inviata all’indirizzo indicato e le risposte possono essere registrate in un foglio Google.
+    </p>
+
+    <p id="status" class="status"></p>
+
+    <div class="actions three">
+      <button type="button" class="secondary" onclick="closeConclusion()">Torna</button>
+      <button type="button" class="danger" onclick="confirmReset()">Azzera</button>
+      <button type="button" onclick="sendToAppsScript()">Invia</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+/*
+  1. Pubblica lo script come Web App.
+  2. Copia qui l'URL finale che termina con /exec.
+*/
+const SCRIPT_URL = "INCOLLA_QUI_URL_WEB_APP";
+
+const STORAGE_KEY = "rubrica_tic_indicatori_v1";
+
+const data = [
+  {
+    area: "Indicatori elaborato",
+    items: [
+      { title: "Rispetto delle normative sul diritto d’autore", levels: [
+        ["Livello 3", "Ho utilizzato esclusivamente materiali e risorse di cui ho verificato le condizioni di utilizzo, controllando le licenze e selezionando consapevolmente le fonti impiegate."],
+        ["Livello 2", "Ho prestato attenzione alla provenienza delle risorse utilizzate e ho verificato alcune condizioni d’uso, pur senza effettuare controlli sistematici su tutte le fonti."],
+        ["Livello 1", "Non ho verificato in modo significativo le condizioni di utilizzo delle risorse impiegate e possiedo ancora una conoscenza limitata delle norme relative al diritto d’autore."]
+      ]},
+      { title: "Dati sensibili e cura della divulgazione", levels: [
+        ["Livello 3", "Ho prestato costante attenzione alla tutela dei dati personali, evitando la diffusione di nominativi, immagini, voci e altri elementi riconducibili agli studenti. Ho inoltre riflettuto criticamente sull’opportunità di condividere prodotti e materiali realizzati dagli alunni."],
+        ["Livello 2", "Ho prestato attenzione alla tutela dei dati personali, evitando la diffusione di nominativi, immagini e voci degli studenti."],
+        ["Livello 1", "Ho cercato di limitare la diffusione di dati sensibili, pur senza adottare sempre criteri chiari e sistematici nella gestione dei materiali condivisi."]
+      ]},
+      { title: "Coerenza con il quadro dei bisogni e con il contesto", levels: [
+        ["Livello 3", "Ho progettato l’intervento a partire dall’analisi dei bisogni del contesto e degli studenti, cercando di proporre risposte coerenti e significative rispetto alle esigenze individuate."],
+        ["Livello 2", "Ho progettato l’intervento tenendo conto sia dei bisogni del contesto sia delle esigenze legate al mio percorso formativo e professionale."],
+        ["Livello 1", "Ho progettato l’intervento principalmente per rispondere alle richieste del percorso formativo, dedicando minore attenzione all’analisi dei bisogni del contesto."]
+      ]},
+      { title: "Chiarezza degli obiettivi educativi e didattici", levels: [
+        ["Livello 3", "Ho definito obiettivi educativi e didattici chiari, descrivendoli in modo comprensibile e individuando evidenze utili per valutarne il raggiungimento."],
+        ["Livello 2", "Ho individuato obiettivi educativi e didattici e, nel corso del lavoro, sono riuscito a descriverli e a riflettere sul loro livello di raggiungimento."],
+        ["Livello 1", "Fatico ancora a definire con precisione gli obiettivi perseguiti e a individuare indicatori che ne consentano la valutazione."]
+      ]},
+      { title: "Funzionalità della mediazione didattica", levels: [
+        ["Livello 3", "Ho progettato mediatori e attività strettamente collegati agli obiettivi formativi, utilizzandoli come strumenti per sostenere apprendimento, partecipazione e inclusione."],
+        ["Livello 2", "Ho progettato mediatori coerenti con le attività proposte, pur non riuscendo sempre a esplicitare pienamente il loro contributo ai processi di apprendimento."],
+        ["Livello 1", "Ho scelto mediatori e strumenti prevalentemente in base alla loro disponibilità o attrattività, senza riflettere approfonditamente sulla loro funzione didattica."]
+      ]},
+      { title: "Sostenibilità nella pratica professionale", levels: [
+        ["Livello 3", "Ho progettato un intervento realisticamente realizzabile nel mio contesto professionale, tenendo conto di tempi, risorse, competenze e vincoli organizzativi."],
+        ["Livello 2", "Ho considerato alcuni aspetti legati alla sostenibilità dell’intervento, pur senza analizzarne tutte le implicazioni operative."],
+        ["Livello 1", "Ho progettato un intervento che potrebbe risultare difficile da realizzare o mantenere nel tempo nel contesto professionale reale."]
+      ]},
+      { title: "Centralità della mediazione rispetto ai software", levels: [
+        ["Livello 3", "Ho concentrato la progettazione sulle scelte didattiche e sulle funzioni dei mediatori, considerando i software come semplici strumenti al servizio degli obiettivi."],
+        ["Livello 2", "Ho alternato riflessioni sulle scelte didattiche e descrizioni degli strumenti utilizzati."],
+        ["Livello 1", "Ho dedicato la maggior parte dell’attenzione alla descrizione dei software, approfondendo poco il significato pedagogico delle scelte effettuate."]
+      ]},
+      { title: "Capacità di motivare le scelte progettuali", levels: [
+        ["Livello 3", "Sono in grado di spiegare e argomentare le principali scelte progettuali, collegandole ai bisogni, agli obiettivi e alle caratteristiche del contesto."],
+        ["Livello 2", "Riesco a spiegare molte delle scelte effettuate, anche se non sempre riesco a collegarle in modo sistematico al quadro progettuale complessivo."],
+        ["Livello 1", "Fatico a motivare le scelte effettuate e a ricostruire le ragioni che mi hanno portato ad adottarle."]
+      ]},
+      { title: "Replicabilità dell’intervento", levels: [
+        ["Livello 3", "Ho progettato un intervento che può essere adattato e riutilizzato anche in altri contesti o con altri gruppi di studenti."],
+        ["Livello 2", "Alcuni elementi dell’intervento risultano trasferibili, mentre altri dipendono fortemente dal contesto in cui sono stati realizzati."],
+        ["Livello 1", "L’intervento è fortemente legato alla situazione specifica in cui è stato sviluppato e risulta difficilmente trasferibile."]
+      ]},
+      { title: "Valore paradigmatico dell’elaborato", levels: [
+        ["Livello 3", "L’elaborato rappresenta un esempio significativo di progettazione didattica e permette di riflettere su principi, strategie e scelte trasferibili ad altre situazioni."],
+        ["Livello 2", "L’elaborato documenta un’esperienza interessante, dalla quale emergono alcuni elementi utili per la riflessione professionale."],
+        ["Livello 1", "L’elaborato descrive prevalentemente un’attività svolta, senza sviluppare particolari riflessioni di carattere generale."]
+      ]},
+      { title: "Livello di accessibilità comunicativa e linguistica", levels: [
+        ["Livello 3", "Ho progettato i materiali tenendo conto dell’accessibilità linguistica e comunicativa, rivedendo testi e consegne per ridurre il carico cognitivo, limitare le inferenze linguistiche e favorire la comprensione."],
+        ["Livello 2", "Ho generalmente adottato uno stile comunicativo adeguato al contesto scolastico, introducendo alcuni adattamenti e semplificazioni per favorire l’accessibilità."],
+        ["Livello 1", "Non sono riuscito a dedicare particolare attenzione agli aspetti di accessibilità linguistica e comunicativa nella progettazione dei materiali."]
+      ]},
+      { title: "Crescita del senso di autoefficacia tecnologica", levels: [
+        ["Livello 3", "Ho acquisito maggiore fiducia nella mia capacità di progettare e utilizzare tecnologie digitali in modo consapevole e funzionale agli obiettivi didattici."],
+        ["Livello 2", "Ho ampliato le mie competenze tecnologiche e mi sento più sicuro nell’utilizzo di alcuni strumenti digitali."],
+        ["Livello 1", "Continuo a percepire insicurezza nell’utilizzo delle tecnologie e necessito ancora di un forte supporto esterno."]
+      ]}
+    ]
+  },
+  {
+    area: "Accessibilità delle slide",
+    items: [
+      { title: "Grandezza dei testi", levels: [
+        ["Livello 3", "Ho utilizzato dimensioni dei caratteri adeguate al contesto di presentazione, garantendo la leggibilità anche a distanza."],
+        ["Livello 2", "La maggior parte dei testi risulta leggibile, anche se alcune parti potrebbero beneficiare di un ulteriore ingrandimento."],
+        ["Livello 1", "Sono presenti testi troppo piccoli che rischiano di compromettere la lettura durante la presentazione."]
+      ]},
+      { title: "Leggibilità dei font", levels: [
+        ["Livello 3", "Ho utilizzato font chiari, leggibili e coerenti con il contesto comunicativo."],
+        ["Livello 2", "I font utilizzati risultano generalmente leggibili, pur presentando alcune criticità o disomogeneità."],
+        ["Livello 1", "La scelta dei font rende difficile la lettura o crea affaticamento visivo."]
+      ]},
+      { title: "Contrasto tra testo e sfondo", levels: [
+        ["Livello 3", "Ho curato il contrasto tra testo e sfondo in tutte le slide, favorendo una lettura immediata dei contenuti."],
+        ["Livello 2", "Il contrasto risulta generalmente adeguato, anche se alcune slide presentano situazioni migliorabili."],
+        ["Livello 1", "In diverse slide il contrasto tra testo e sfondo rende difficoltosa la lettura."]
+      ]},
+      { title: "Riduzione del rumore visivo", levels: [
+        ["Livello 3", "Ho eliminato elementi grafici non funzionali al messaggio, mantenendo l’attenzione sui contenuti realmente significativi."],
+        ["Livello 2", "La maggior parte degli elementi grafici contribuisce al messaggio, anche se alcuni risultano ridondanti o poco utili."],
+        ["Livello 1", "Sono presenti numerosi elementi decorativi che aumentano il rumore visivo e distraggono dai contenuti principali."]
+      ]},
+      { title: "Gestione dei distrattori", levels: [
+        ["Livello 3", "Ho evitato animazioni o elementi in movimento che potessero distrarre dalla comunicazione del contenuto."],
+        ["Livello 2", "Sono presenti alcuni elementi dinamici che, pur non compromettendo la presentazione, potrebbero risultare distraenti."],
+        ["Livello 1", "Animazioni, effetti o oggetti in movimento interferiscono significativamente con l’attenzione dell’osservatore."]
+      ]}
+    ]
+  },
+  {
+    area: "Struttura delle slide",
+    items: [
+      { title: "Coerenza grafica e comunicativa", levels: [
+        ["Livello 3", "Grafica, font, immagini e organizzazione visiva risultano coerenti con il messaggio complessivo della presentazione."],
+        ["Livello 2", "È presente una discreta coerenza tra gli elementi grafici e il messaggio, con alcune discontinuità."],
+        ["Livello 1", "Gli elementi grafici risultano poco coerenti tra loro o con il messaggio che si intende comunicare."]
+      ]},
+      { title: "Gerarchia delle informazioni", levels: [
+        ["Livello 3", "Ho costruito una chiara gerarchia visiva tra titoli, sottotitoli, corpo del testo e parole chiave, facilitando lo skimming e l’orientamento del lettore."],
+        ["Livello 2", "La gerarchia delle informazioni è generalmente riconoscibile, anche se alcuni elementi potrebbero essere valorizzati meglio."],
+        ["Livello 1", "Le informazioni appaiono sullo stesso piano comunicativo, rendendo difficile individuare rapidamente i contenuti più importanti."]
+      ]},
+      { title: "Presenza di elementi non significativi", levels: [
+        ["Livello 3", "Ogni elemento presente nelle slide contribuisce alla comprensione del messaggio o alla sua valorizzazione."],
+        ["Livello 2", "Sono presenti alcuni elementi non indispensabili, che tuttavia non compromettono la chiarezza della comunicazione."],
+        ["Livello 1", "Sono presenti numerosi elementi inutili, ridondanti o poco pertinenti rispetto agli obiettivi comunicativi."]
+      ]}
+    ]
+  },
+  {
+    area: "Presentazione orale",
+    items: [
+      { title: "Rispetto dei tempi", levels: [
+        ["Livello 3", "Ho gestito l’esposizione rispettando i tempi previsti, dedicando spazio adeguato ai diversi aspetti del lavoro."],
+        ["Livello 2", "Ho sostanzialmente rispettato i tempi, con alcune lievi accelerazioni o rallentamenti."],
+        ["Livello 1", "La gestione del tempo non mi ha consentito di sviluppare adeguatamente tutti i contenuti previsti."]
+      ]},
+      { title: "Uso del paraverbale e del non verbale", levels: [
+        ["Livello 3", "Ho utilizzato tono della voce, ritmo, pause, sguardo e postura per mantenere alta l’attenzione degli ascoltatori."],
+        ["Livello 2", "Ho utilizzato alcuni elementi paraverbali e non verbali in modo efficace, pur con margini di miglioramento."],
+        ["Livello 1", "L’esposizione è risultata prevalentemente monotona o poco supportata dalla comunicazione non verbale."]
+      ]},
+      { title: "Equilibrio tra astrazione ed esemplificazione", levels: [
+        ["Livello 3", "Ho saputo alternare riflessioni teoriche ed esempi concreti, favorendo la comprensione delle scelte progettuali."],
+        ["Livello 2", "Ho utilizzato sia esempi sia momenti di concettualizzazione, ma senza sempre trovare un equilibrio efficace."],
+        ["Livello 1", "L’esposizione è risultata eccessivamente teorica oppure esclusivamente descrittiva."]
+      ]},
+      { title: "Funzionamento dei mediatori collegati", levels: [
+        ["Livello 3", "Tutti i materiali, collegamenti e mediatori digitali utilizzati durante la presentazione hanno funzionato correttamente e sono stati integrati nell’esposizione."],
+        ["Livello 2", "La maggior parte dei materiali ha funzionato correttamente, con alcune piccole criticità tecniche."],
+        ["Livello 1", "Problemi tecnici o organizzativi hanno limitato significativamente la possibilità di mostrare i materiali previsti."]
+      ]},
+      { title: "Utilizzo di categorie pedagogiche per descrivere le TIC", levels: [
+        ["Livello 3", "Ho descritto i mediatori digitali attraverso la loro funzione didattica, come bacheca digitale, ambiente interattivo, rappresentazione della conoscenza, storytelling digitale, andando oltre il semplice riferimento ai software utilizzati."],
+        ["Livello 2", "Ho alternato riferimenti ai software e riferimenti alle loro funzioni pedagogiche."],
+        ["Livello 1", "Ho descritto prevalentemente i software utilizzati, approfondendo poco il significato educativo e didattico delle scelte effettuate."]
+      ]}
+    ]
+  }
+];
+
+const container = document.getElementById("rubriche");
+const totalIndicators = data.reduce((sum, group) => sum + group.items.length, 0);
+
+function safeId(gi, ii, li) {
+  return `g${gi}_i${ii}_l${li}`;
+}
+
+function render() {
+  data.forEach((group, gi) => {
+    const details = document.createElement("details");
+    details.open = gi === 0;
+    details.dataset.group = gi;
+
+    const summary = document.createElement("summary");
+    summary.innerHTML = `
+      <span class="summary-left">
+        <span class="summary-title">${group.area}</span>
+        <span class="summary-progress" id="summary_progress_${gi}">0/${group.items.length} selezionati</span>
+      </span>
+      <span class="chevron">›</span>
+    `;
+    details.appendChild(summary);
+
+    const areaContent = document.createElement("div");
+    areaContent.className = "area-content";
+
+    group.items.forEach((item, ii) => {
+      const block = document.createElement("div");
+      block.className = "indicator";
+      block.dataset.indicatorBlock = `g${gi}_i${ii}`;
+
+      const title = document.createElement("div");
+      title.className = "indicator-title";
+      title.textContent = item.title;
+      block.appendChild(title);
+
+      const levels = document.createElement("div");
+      levels.className = "levels";
+
+      item.levels.forEach((level, li) => {
+        const id = safeId(gi, ii, li);
+        const label = document.createElement("label");
+        label.className = "level";
+        label.dataset.area = group.area;
+        label.dataset.groupIndex = gi;
+        label.dataset.itemIndex = ii;
+        label.dataset.levelIndex = li;
+        label.dataset.indicator = item.title;
+        label.dataset.level = level[0];
+        label.dataset.text = level[1];
+
+        label.innerHTML = `
+          <input type="radio" name="g${gi}_i${ii}" id="${id}">
+          <span class="level-text-wrap">
+            <span class="level-name">${level[0]}</span>
+            <span class="level-text">${level[1]}</span>
+          </span>
+        `;
+
+        label.querySelector("input").addEventListener("change", () => {
+          updateSelectionStyles();
+          saveState();
+          updateProgress();
+        });
+
+        levels.appendChild(label);
+      });
+
+      block.appendChild(levels);
+      areaContent.appendChild(block);
+    });
+
+    details.appendChild(areaContent);
+    container.appendChild(details);
+  });
+
+  loadState();
+  updateSelectionStyles();
+  updateProgress();
+}
+
+function getSelectedLabels() {
+  return [...document.querySelectorAll("input[type=radio]:checked")].map(input => input.closest(".level"));
+}
+
+function updateSelectionStyles() {
+  document.querySelectorAll(".level").forEach(label => label.classList.remove("selected"));
+  getSelectedLabels().forEach(label => label.classList.add("selected"));
+}
+
+function updateProgress() {
+  const selected = getSelectedLabels();
+  const n = selected.length;
+  const percentage = totalIndicators ? Math.round((n / totalIndicators) * 100) : 0;
+
+  document.getElementById("progressText").textContent = `${n}/${totalIndicators} indicatori selezionati`;
+  document.getElementById("progressBar").style.width = `${percentage}%`;
+
+  data.forEach((group, gi) => {
+    const selectedInGroup = selected.filter(label => Number(label.dataset.groupIndex) === gi).length;
+    const el = document.getElementById(`summary_progress_${gi}`);
+    if (el) el.textContent = `${selectedInGroup}/${group.items.length} selezionati`;
+  });
+}
+
+function makeSummary() {
+  const nome = document.getElementById("nome").value.trim();
+  const selected = getSelectedLabels();
+
+  let lines = [];
+  if (nome) lines.push(`Nome e cognome: ${nome}`, "");
+
+  let currentArea = "";
+  selected.forEach(label => {
+    const area = label.dataset.area;
+    if (area !== currentArea) {
+      if (lines.length) lines.push("");
+      lines.push(area.toUpperCase());
+      currentArea = area;
+    }
+    lines.push(`- ${label.dataset.indicator}: ${label.dataset.level}`);
+    lines.push(`  ${label.dataset.text}`);
+  });
+
+  return lines.join("\n").trim();
+}
+
+function makePayload() {
+  const selected = getSelectedLabels().map(label => ({
+    area: label.dataset.area,
+    indicatore: label.dataset.indicator,
+    livello: label.dataset.level,
+    testo: label.dataset.text
+  }));
+
+  return {
+    nome: document.getElementById("nome").value.trim(),
+    email: document.getElementById("email").value.trim(),
+    riepilogo: makeSummary(),
+    selezioni: selected,
+    completamento: `${selected.length}/${totalIndicators}`,
+    pagina: window.location.href,
+    userAgent: navigator.userAgent
+  };
+}
+
+function openConclusion() {
+  const status = document.getElementById("status");
+  status.textContent = "";
+  status.className = "status";
+
+  document.getElementById("output").value = makeSummary();
+  document.getElementById("conclusionDialog").showModal();
+
+  setTimeout(() => {
+    const nome = document.getElementById("nome");
+    if (!nome.value.trim()) nome.focus();
+  }, 80);
+}
+
+function closeConclusion() {
+  document.getElementById("conclusionDialog").close();
+}
+
+function saveState() {
+  const selected = getSelectedLabels().map(label => ({
+    groupIndex: Number(label.dataset.groupIndex),
+    itemIndex: Number(label.dataset.itemIndex),
+    levelIndex: Number(label.dataset.levelIndex)
+  }));
+
+  const state = {
+    nome: document.getElementById("nome")?.value || "",
+    email: document.getElementById("email")?.value || "",
+    selected
+  };
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+
+    const state = JSON.parse(raw);
+
+    if (state.nome && document.getElementById("nome")) document.getElementById("nome").value = state.nome;
+    if (state.email && document.getElementById("email")) document.getElementById("email").value = state.email;
+
+    (state.selected || []).forEach(item => {
+      const input = document.getElementById(safeId(item.groupIndex, item.itemIndex, item.levelIndex));
+      if (input) input.checked = true;
+    });
+  } catch (e) {
+    console.warn("Impossibile caricare il salvataggio locale", e);
+  }
+}
+
+function confirmReset() {
+  if (confirm("Vuoi davvero azzerare tutte le selezioni salvate su questo dispositivo?")) {
+    document.querySelectorAll("input[type=radio]").forEach(input => input.checked = false);
+    document.getElementById("nome").value = "";
+    document.getElementById("email").value = "";
+    document.getElementById("output").value = "";
+    localStorage.removeItem(STORAGE_KEY);
+    updateSelectionStyles();
+    updateProgress();
+
+    const status = document.getElementById("status");
+    status.textContent = "Selezione azzerata.";
+    status.className = "status warn";
+  }
+}
+
+document.addEventListener("input", (event) => {
+  if (event.target.id === "nome" || event.target.id === "email") {
+    saveState();
+    document.getElementById("output").value = makeSummary();
+  }
+});
+
+async function sendToAppsScript() {
+  const status = document.getElementById("status");
+  const payload = makePayload();
+  document.getElementById("output").value = payload.riepilogo;
+
+  if (!payload.nome) {
+    status.textContent = "Inserisci nome e cognome.";
+    status.className = "status error";
+    return;
+  }
+
+  if (!payload.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
+    status.textContent = "Inserisci un indirizzo email valido.";
+    status.className = "status error";
+    return;
+  }
+
+  if (!payload.selezioni.length) {
+    status.textContent = "Seleziona almeno un indicatore.";
+    status.className = "status error";
+    return;
+  }
+
+  if (SCRIPT_URL === "INCOLLA_QUI_URL_WEB_APP") {
+    status.textContent = "Prima devi incollare nell’HTML l’URL della Web App di Google Apps Script.";
+    status.className = "status error";
+    return;
+  }
+
+  status.textContent = "Invio in corso...";
+  status.className = "status";
+
+  try {
+    await fetch(SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
+    });
+
+    status.textContent = "Invio effettuato. Controlla la casella email indicata.";
+    status.className = "status success";
+  } catch (err) {
+    status.textContent = "Invio non riuscito. Controlla l’URL dello script e la pubblicazione della Web App.";
+    status.className = "status error";
+  }
+}
+
+render();
+</script>
+</body>
+</html>
